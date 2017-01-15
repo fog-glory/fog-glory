@@ -4,7 +4,7 @@ node_js:
   - "5"
   - "6"
 script:
-  - cd examples && npm install
+  - ( cd examples; npm install )
   - npm run test:all
 after_success:
   - bash <(curl -s https://codecov.io/bash)
