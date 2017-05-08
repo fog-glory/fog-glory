@@ -64,6 +64,18 @@ module.exports = {
 
 And, that's it! Your scripts and view files will be scanned for classes, and those that are unused will be stripped off your CSS - aka. "purified".
 
+In order to use this plugin to look into multiple paths you will need to:
+
+1. npm install --save glob-all
+2. Add const glob = require('glob-all'); at the top of your webpack config
+3. Then you can pass your paths to an array, like so:
+```
+paths: glob.sync([
+    path.join(__dirname, '.php'),
+    path.join(__dirname, 'partials/.php')
+]),
+```
+
 > You can pass an object (`<entry> -> [<absolute path>]`) to `paths` if you want to control the behavior per entry.
 
 <h2 align="center">Options</h2>
