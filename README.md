@@ -21,6 +21,8 @@ Without any CSS file being emitted as an asset, this plugin will do nothing. You
 
 > This plugin replaces earlier [purifycss-webpack-plugin](https://www.npmjs.com/package/purifycss-webpack-plugin) and it has a different API!
 
+Testing the CLA Assistant
+
 <h2 align="center">Install</h2>
 
 ```bash
