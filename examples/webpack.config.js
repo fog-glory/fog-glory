@@ -44,7 +44,7 @@ module.exports = [
       paths: {
         first: glob.sync(`${PATHS.app}/*`),
         second: glob.sync(`${PATHS.another}/*`)
-      },
+      }
     })
   )
 ];
