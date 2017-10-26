@@ -37,19 +37,19 @@ module.exports = function PurifyPlugin(options) {
         compilation.plugin('additional-assets', (cb) => {
           // Go through chunks and include them to the paths that will be parsed
           if (options.modulePathsTest) {
-            let regexp = new RegExp(options.modulePathsTest)
-            let includeModules = []
+            const regexp = new RegExp(options.modulePathsTest);
+            const includeModules = [];
 
-            compilation.modules.forEach(mod => {
-              let res = mod.resource
+            compilation.modules.forEach((mod) => {
+              const res = mod.resource;
 
               if (regexp.test(res)) {
-                includeModules.push(res)
+                includeModules.push(res);
               }
-            })
+            });
 
             if (includeModules.length) {
-              entryPaths = entryPaths.concat(includeModules)
+              entryPaths = entryPaths.concat(includeModules);
             }
           }
 
