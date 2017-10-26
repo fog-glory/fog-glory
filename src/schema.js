@@ -26,6 +26,9 @@ const schema = ({ entry } = {}) => ({
     },
     verbose: {
       type: 'boolean'
+    },
+    modulePathsTest: {
+      type: 'string'
     }
   },
   required: [
