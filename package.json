@@ -39,7 +39,7 @@
     ]
   },
   "author": "Kenny Tran, Matthew Rourke, Phoebe Li, Kevin \"Ingwie Phoenix\" Ingwersen",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/webpack-contrib/purifycss-webpack/issues"
   },
