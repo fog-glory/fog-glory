@@ -76,8 +76,32 @@ paths: glob.sync([
   path.join(__dirname, 'partials/.php')
 ]),
 ```
-
 > You can pass an object (`<entry> -> [<absolute path>]`) to `paths` if you want to control the behavior per entry.
+
+<h3 align="center">Vue.js usage example</h3>
+I used wepback template from vue-cli https://github.com/vuejs/vue-cli
+
+1. Install PurifyCSS as described above
+2. Add to build/webpack.prod.conf.js :
+
+```
+//after ExtractTextPlugin
+new PurifyCSSPlugin({
+      // Give paths to parse for rules. These should be absolute! 
+        purifyOptions: {
+            whitelist: ['*purify*']
+        },
+      paths: glob.sync(path.join(__dirname, '../src/components/*.vue')),
+    }),
+```
+
+Results: 
+
+Before  app.css 141 kB , unused CSS rules 1851
+
+After   app.css 28 kB , unused CSS rules 246
+
+
 
 <h2 align="center">Options</h2>
 
