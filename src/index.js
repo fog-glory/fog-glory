@@ -20,7 +20,7 @@ module.exports = function PurifyPlugin(options) {
         throw new Error(validation.error);
       }
 
-      compiler.plugin('this-compilation', (compilation) => {
+      const thisCompilation = (compilation) => {
         const entryPaths = parse.entryPaths(options.paths);
 
         parse.flatten(entryPaths).forEach((p) => {
@@ -29,57 +29,79 @@ module.exports = function PurifyPlugin(options) {
 
         // Output debug information through a callback pattern
         // to avoid unnecessary processing
-        const output = options.verbose ?
-          messageCb => console.info(...messageCb()) :
-          () => {};
+        const output = options.verbose
+          ? messageCb => console.info(...messageCb())
+          : () => {};
 
-        compilation.plugin('additional-assets', (cb) => {
+        const additionalAssets = (...param) => {
+          let chunks;
+          let cb;
+          if (param.length === 1) {
+            chunks = compilation.chunks;
+            cb = param[0];
+          } else {
+            chunks = param[0];
+            cb = param[1];
+          }
           // Go through chunks and purify as configured
-          compilation.chunks.forEach(
-            ({ name: chunkName, files, modules }) => {
-              const assetsToPurify = search.assets(
-                compilation.assets, options.styleExtensions
-              ).filter(
-                asset => files.indexOf(asset.name) >= 0
-              );
+          chunks.forEach(({ name: chunkName, files, modules }) => {
+            const assetsToPurify = search
+              .assets(compilation.assets, options.styleExtensions)
+              .filter(asset => files.indexOf(asset.name) >= 0);
+
+            output(() => [
+              'Assets to purify:',
+              assetsToPurify.map(({ name }) => name).join(', ')
+            ]);
+
+            assetsToPurify.forEach(({ name, asset }) => {
+              const filesToSearch = parse
+                .entries(entryPaths, chunkName)
+                .concat(
+                  search.files(
+                    modules,
+                    options.moduleExtensions || [],
+                    file => file.resource
+                  )
+                );
 
               output(() => [
-                'Assets to purify:',
-                assetsToPurify.map(({ name }) => name).join(', ')
+                'Files to search for used rules:',
+                filesToSearch.join(', ')
               ]);
 
-              assetsToPurify.forEach(({ name, asset }) => {
-                const filesToSearch = parse.entries(entryPaths, chunkName).concat(
-                  search.files(
-                    modules, options.moduleExtensions || [], file => file.resource
-                  )
-                );
-
-                output(() => [
-                  'Files to search for used rules:',
-                  filesToSearch.join(', ')
-                ]);
-
-                // Compile through Purify and attach to output.
-                // This loses sourcemaps should there be any!
-                compilation.assets[name] = new ConcatSource(
-                  purify(
-                    filesToSearch,
-                    asset.source(),
-                    {
-                      info: options.verbose,
-                      minify: options.minimize,
-                      ...options.purifyOptions
-                    }
-                  )
-                );
-              });
-            }
-          );
+              // Compile through Purify and attach to output.
+              // This loses sourcemaps should there be any!
+              compilation.assets[name] = new ConcatSource(
+                purify(filesToSearch, asset.source(), {
+                  info: options.verbose,
+                  minify: options.minimize,
+                  ...options.purifyOptions
+                })
+              );
+            });
+          });
 
           cb();
-        });
-      });
+        };
+        if (compilation.hooks) {
+          compilation.hooks.additionalAssets('PurifyPlugin', (chunks, cb) =>
+            additionalAssets(chunks, cb)
+          );
+        } else {
+          compilation.plugin('additional-assets', cb => additionalAssets(cb));
+        }
+      };
+
+      if (compiler.hooks) {
+        // Support Webpack 4
+        compiler.hooks.thisCompilation.tapAsync(
+          'PurifyPlugin',
+          thisCompilation
+        );
+      } else {
+        compiler.plugin('this-compilation', thisCompilation);
+      }
     }
   };
 };
