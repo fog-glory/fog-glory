@@ -1,4 +1,4 @@
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PurifyCSSPlugin = require('../');
 
 exports.extractCSS = function extractCSS(paths) {
@@ -8,15 +8,17 @@ exports.extractCSS = function extractCSS(paths) {
         {
           test: /\.css$/,
           include: paths,
-          loader: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: 'css-loader?sourceMap'
-          })
+          use: [
+            MiniCssExtractPlugin.loader,
+            'css-loader?sourceMap'
+          ]
         }
       ]
     },
     plugins: [
-      new ExtractTextPlugin('[name].css?[hash]')
+      new MiniCssExtractPlugin({
+        filename: '[name].css?[hash]'
+      })
     ]
   };
 };

@@ -20,9 +20,9 @@ Please use: https://github.com/FullHuman/purgecss-webpack-plugin
   <p>PurifyCSS for Webpack.<p>
 </div>
 
-This plugin uses [PurifyCSS](https://github.com/purifycss/purifycss) to remove unused selectors from your CSS. You **should** use it with the [extract-text-webpack-plugin](https://www.npmjs.com/package/extract-text-webpack-plugin).
+This plugin uses [PurifyCSS](https://github.com/purifycss/purifycss) to remove unused selectors from your CSS. You **should** use it with the [mini-css-extract-plugin](https://www.npmjs.com/package/mini-css-extract-plugin).
 
-Without any CSS file being emitted as an asset, this plugin will do nothing. You can also use the `file` plugin to drop a CSS file into your output folder, but it is highly recommended to use the PurifyCSS plugin with the Extract Text plugin.
+Without any CSS file being emitted as an asset, this plugin will do nothing. You can also use the `file` plugin to drop a CSS file into your output folder, but it is highly recommended to use the PurifyCSS plugin with the Mini CSS Extract plugin.
 
 > This plugin replaces earlier [purifycss-webpack-plugin](https://www.npmjs.com/package/purifycss-webpack-plugin) and it has a different API!
 
@@ -39,7 +39,7 @@ Configure as follows:
 ```javascript
 const path = require('path');
 const glob = require('glob');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack');
 
 module.exports = {
@@ -49,16 +49,18 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style-loader',
-          loader: 'css-loader'
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader'
+        ]
       }
     ]
   },
   plugins: [
-    new ExtractTextPlugin('[name].[contenthash].css'),
-    // Make sure this is after ExtractTextPlugin!
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css'
+    }),
+    // Make sure this is after MiniCssExtractPlugin!
     new PurifyCSSPlugin({
       // Give paths to parse for rules. These should be absolute!
       paths: glob.sync(path.join(__dirname, 'app/*.html')),
@@ -111,18 +113,16 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                localIdentName: 'purify_[hash:base64:5]',
-                modules: true
-              }
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              localIdentName: 'purify_[hash:base64:5]',
+              modules: true
             }
-          ]
-        })
+          }
+        ]
       }
     ]
   },
