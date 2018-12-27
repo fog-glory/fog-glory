@@ -3,13 +3,6 @@ const schema = ({ entry } = {}) => ({
   additionalProperties: false,
   type: 'object',
   properties: {
-    styleExtensions: {
-      type: 'array',
-      items: {
-        type: 'string'
-      },
-      default: ['.css']
-    },
     minimize: {
       type: 'boolean'
     },

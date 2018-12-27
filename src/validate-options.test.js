@@ -33,18 +33,6 @@ describe('Validate options', function () {
     assert.ok(result.error);
   });
 
-  it('styleExtensions have defaults', function () {
-    const paths = ['./foo'];
-    const data = { paths };
-
-    // Currently this mutates data with defaults due to ajv design. It
-    // might be a good idea to change that behavior, though.
-    const result = validateOptions(schema(), data);
-
-    assert.deepEqual(data, { paths, styleExtensions: ['.css'] });
-    assert.ok(!result.error);
-  });
-
   it('fails without matching path keys', function () {
     const data = {
       paths: {

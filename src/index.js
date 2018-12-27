@@ -38,7 +38,7 @@ module.exports = function PurifyPlugin(options) {
           compilation.chunks.forEach(
             ({ name: chunkName, files, modules }) => {
               const assetsToPurify = search.assets(
-                compilation.assets, options.styleExtensions
+                compilation.assets, ['.css']
               ).filter(
                 asset => files.indexOf(asset.name) >= 0
               );
