@@ -21,7 +21,8 @@ module.exports = function PurifyPlugin(options) {
       }
 
       compiler.plugin('this-compilation', (compilation) => {
-        const entryPaths = parse.entryPaths(options.paths);
+        let entryPaths = parse.entryPaths(options.paths);
+
 
         parse.flatten(entryPaths).forEach((p) => {
           if (!fs.existsSync(p)) throw new Error(`Path ${p} does not exist.`);
@@ -34,6 +35,24 @@ module.exports = function PurifyPlugin(options) {
           () => {};
 
         compilation.plugin('additional-assets', (cb) => {
+          // Go through chunks and include them to the paths that will be parsed
+          if (options.modulePathsTest) {
+            const regexp = new RegExp(options.modulePathsTest);
+            const includeModules = [];
+
+            compilation.modules.forEach((mod) => {
+              const res = mod.resource;
+
+              if (regexp.test(res)) {
+                includeModules.push(res);
+              }
+            });
+
+            if (includeModules.length) {
+              entryPaths = entryPaths.concat(includeModules);
+            }
+          }
+
           // Go through chunks and purify as configured
           compilation.chunks.forEach(
             ({ name: chunkName, files, modules }) => {
