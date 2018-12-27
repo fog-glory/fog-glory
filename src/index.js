@@ -36,7 +36,9 @@ module.exports = function PurifyPlugin(options) {
         compilation.plugin('additional-assets', (cb) => {
           // Go through chunks and purify as configured
           compilation.chunks.forEach(
-            ({ name: chunkName, files, modules }) => {
+            (chunk) => {
+              const { name: chunkName, files } = chunk;
+              const modules = chunk.mapModules(module => module);
               const assetsToPurify = search.assets(
                 compilation.assets, options.styleExtensions
               ).filter(
